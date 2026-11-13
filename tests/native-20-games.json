@@ -1,0 +1,431 @@
+{
+  "romSha256": "d9a55c35a27d642d678ad2a87d67723428662ba02352c4179067c3ff4e1e3683",
+  "rival": "SOREN",
+  "rating": 1800,
+  "mode": "Practice",
+  "driver": "Seeded random legal human-side baseline; read-only board observation and ordinary D-pad/A inputs.",
+  "games": [
+    {
+      "game": 1,
+      "playerColor": 1,
+      "winner": 2,
+      "plies": 12,
+      "moves": [
+        128,
+        130,
+        86,
+        100,
+        115,
+        99,
+        223,
+        101,
+        125,
+        98,
+        15,
+        102
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 2,
+      "playerColor": 1,
+      "winner": 2,
+      "plies": 12,
+      "moves": [
+        103,
+        102,
+        195,
+        133,
+        123,
+        87,
+        35,
+        117,
+        183,
+        132,
+        193,
+        147
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 3,
+      "playerColor": 1,
+      "winner": 2,
+      "plies": 12,
+      "moves": [
+        78,
+        48,
+        171,
+        50,
+        76,
+        65,
+        104,
+        80,
+        106,
+        35,
+        43,
+        95
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 4,
+      "playerColor": 2,
+      "winner": 1,
+      "plies": 9,
+      "moves": [
+        112,
+        106,
+        113,
+        116,
+        111,
+        76,
+        114,
+        182,
+        115
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 5,
+      "playerColor": 2,
+      "winner": 1,
+      "plies": 17,
+      "moves": [
+        112,
+        151,
+        143,
+        199,
+        144,
+        195,
+        167,
+        196,
+        197,
+        76,
+        166,
+        163,
+        152,
+        67,
+        182,
+        177,
+        212
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 6,
+      "playerColor": 2,
+      "winner": 1,
+      "plies": 11,
+      "moves": [
+        112,
+        95,
+        126,
+        4,
+        141,
+        63,
+        111,
+        153,
+        96,
+        174,
+        156
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 7,
+      "playerColor": 2,
+      "winner": 1,
+      "plies": 11,
+      "moves": [
+        112,
+        45,
+        140,
+        72,
+        144,
+        90,
+        154,
+        88,
+        126,
+        170,
+        168
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 8,
+      "playerColor": 2,
+      "winner": 1,
+      "plies": 11,
+      "moves": [
+        112,
+        39,
+        95,
+        126,
+        80,
+        82,
+        96,
+        97,
+        128,
+        145,
+        144
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 9,
+      "playerColor": 2,
+      "winner": 1,
+      "plies": 11,
+      "moves": [
+        112,
+        41,
+        99,
+        221,
+        84,
+        117,
+        114,
+        108,
+        69,
+        224,
+        129
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 10,
+      "playerColor": 2,
+      "winner": 1,
+      "plies": 11,
+      "moves": [
+        112,
+        151,
+        98,
+        54,
+        99,
+        148,
+        84,
+        39,
+        70,
+        132,
+        126
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 11,
+      "playerColor": 2,
+      "winner": 1,
+      "plies": 11,
+      "moves": [
+        112,
+        136,
+        81,
+        224,
+        80,
+        12,
+        82,
+        44,
+        79,
+        130,
+        83
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 12,
+      "playerColor": 1,
+      "winner": 2,
+      "plies": 12,
+      "moves": [
+        51,
+        81,
+        156,
+        83,
+        158,
+        68,
+        54,
+        53,
+        36,
+        38,
+        33,
+        98
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 13,
+      "playerColor": 1,
+      "winner": 2,
+      "plies": 14,
+      "moves": [
+        22,
+        37,
+        178,
+        21,
+        3,
+        24,
+        213,
+        69,
+        53,
+        54,
+        219,
+        39,
+        25,
+        84
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 14,
+      "playerColor": 1,
+      "winner": 2,
+      "plies": 12,
+      "moves": [
+        218,
+        216,
+        33,
+        203,
+        150,
+        189,
+        52,
+        161,
+        157,
+        175,
+        206,
+        217
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 15,
+      "playerColor": 1,
+      "winner": 2,
+      "plies": 12,
+      "moves": [
+        134,
+        102,
+        84,
+        164,
+        147,
+        148,
+        188,
+        132,
+        93,
+        100,
+        215,
+        116
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 16,
+      "playerColor": 2,
+      "winner": 1,
+      "plies": 11,
+      "moves": [
+        112,
+        44,
+        141,
+        100,
+        140,
+        199,
+        142,
+        89,
+        139,
+        146,
+        143
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 17,
+      "playerColor": 2,
+      "winner": 1,
+      "plies": 11,
+      "moves": [
+        112,
+        209,
+        83,
+        194,
+        84,
+        38,
+        70,
+        65,
+        98,
+        74,
+        126
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 18,
+      "playerColor": 1,
+      "winner": 2,
+      "plies": 12,
+      "moves": [
+        89,
+        74,
+        168,
+        88,
+        134,
+        119,
+        208,
+        102,
+        133,
+        130,
+        59,
+        116
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 19,
+      "playerColor": 2,
+      "winner": 1,
+      "plies": 11,
+      "moves": [
+        112,
+        141,
+        128,
+        65,
+        143,
+        204,
+        113,
+        123,
+        98,
+        72,
+        158
+      ],
+      "duplicate": false
+    },
+    {
+      "game": 20,
+      "playerColor": 1,
+      "winner": 2,
+      "plies": 12,
+      "moves": [
+        172,
+        144,
+        70,
+        170,
+        121,
+        186,
+        59,
+        138,
+        68,
+        154,
+        78,
+        202
+      ],
+      "duplicate": false
+    }
+  ],
+  "illegalMoves": 0,
+  "maxThinkingFrames": 149,
+  "maxVisibleFrames": 151,
+  "maxSliceFrames": 4,
+  "passed": true,
+  "timingNote": "Same-ROM native-frame counters; maximum visible thinking 151 frames, maximum compute slice four frames. Sampled images do not prove continuous 60 FPS.",
+  "sliceAcceptanceFrames": 6
+}
