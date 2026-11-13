@@ -143,21 +143,21 @@ static void draw_popup(void) {
     }
     if (pz_notice == 1) {
         popup_box(tt_title_win);
-        tt_text(3, 8, "Incredible!", 0);
-        tt_text(3, 9, "Aim for 4096", 0);
-        tt_put(3, 11, TT_T_BTN_A, 6);
-        tt_text(5, 11, "Keep going", 0);
+        tt_text(2, 8, "Incredible!", 0);
+        tt_text(2, 9, "Aim for 4096", 0);
+        tt_put(2, 11, TT_T_BTN_A, 6);
+        tt_text(4, 11, "Keep going", 0);
         popup = 1;
     } else if (pz_notice == 2) {
         popup_box(tt_title_over);
-        tt_text(3, 8, "Score", 0);
-        tt_number(9, 8, tt_save.puzzle.score, 0, 0);
-        if (tt_save.puzzle.score >= tt_save.puzzle.best && tt_save.puzzle.score) tt_text(3, 9, "New record!", 0);
-        tt_put(3, 11, TT_T_BTN_A, 6);
-        tt_text(5, 11, "New game", 0);
+        tt_text(2, 8, "Score", 0);
+        tt_number(8, 8, tt_save.puzzle.score, 0, 0);
+        if (tt_save.puzzle.score >= tt_save.puzzle.best && tt_save.puzzle.score) tt_text(2, 9, "New record!", 0);
+        tt_put(2, 11, TT_T_BTN_A, 6);
+        tt_text(4, 11, "New game", 0);
         if (tt_save.puzzle.undo) {
-            tt_put(3, 12, TT_T_BTN_B, 6);
-            tt_text(5, 12, "Undo move", 0);
+            tt_put(2, 12, TT_T_BTN_B, 6);
+            tt_text(4, 12, "Undo move", 0);
         }
         popup = 2;
     }

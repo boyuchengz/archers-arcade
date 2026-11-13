@@ -1,6 +1,6 @@
 # Validation (v2 "Game Night")
 
-Release ROM `ArchersTabletop-v2.gbc`: 262,144 bytes, SHA-256 `940e4aaff8927a123a9a0b10f161bb042ba3aeb902c876e8b591e0b75fbd0516`.
+Release ROM `ArchersTabletop-v2.gbc`: 262,144 bytes, SHA-256 `8c2531141657c50dd61d5469ac6708003156e3017a0640962e5a8b5cc719137f`.
 
 ## Build
 - Official GB Studio 4.3.2 CLI build (GBDK 4.5.0), GBC-only.
