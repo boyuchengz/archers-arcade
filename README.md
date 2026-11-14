@@ -16,6 +16,14 @@ A Game Boy Color cartridge with Gomoku and 2048, built for the ModRetro Chromati
 
 Saves from v1 load unchanged (same save layout). Music now defaults to on; turn it off in Settings.
 
+## v2.1: a real difficulty ladder
+
+In earlier builds all ten rivals played at the same strength. Now each rival has its own skill profile in `tt_ai.c` (`skills` table): how often it misses its own five, overlooks your four or makes a careless attacking move, how deep it reads four-chains (VCF), whether it sees yours, and how far it looks ahead. PIP is genuinely beatable; SOREN plays exactly as strong as before. Practice always gives you black (the first move).
+
+`tests/difficulty_sim.c` plays simulated players against every rival to check the ladder:
+
+    cc -O2 -w -Iplugins/tabletop/engine/include -Iplugins/tabletop/engine/src/states tests/difficulty_sim.c -o /tmp/sim && /tmp/sim 400
+
 ## Controls
 
 Menus: Left/Right pick, A open, B back.

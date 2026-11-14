@@ -134,7 +134,7 @@ static void footer_stat(void) {
         tt_text(3, 0, tt_save_available ? "Autosave is on" : "No save battery", P_BAR);
     } else if (screen == SCR_MODES && page == 1) {
         tt_put(1, 0, TT_T_HEART, P_BAR);
-        tt_text(3, 0, "No Elo at stake", P_BAR);
+        tt_text(3, 0, "You play black", P_BAR);
     } else if (screen == SCR_MODES && page == 2) {
         tt_put(1, 0, TT_T_STONE_B, P_BAR);
         tt_text(3, 0, "Black moves first", P_BAR);

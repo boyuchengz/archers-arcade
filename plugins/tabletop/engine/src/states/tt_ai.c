@@ -11,6 +11,13 @@
 uint8_t ai_done,ai_move,ai_resign,ai_hint,ai_cancelled;
 uint16_t ai_started,ai_finished,ai_nodes,ai_max_elapsed,ai_max_slice,ai_visible_at,ai_max_visible;
 uint8_t ai_completed_depth;
+/* Per-rival skill: miss own five %, miss blocking a four %, careless move %,
+   own four-chain (VCF) depth, sees your four-chains, lookahead depth,
+   how many of its top attacking moves a careless move picks from. */
+static const uint8_t skills[10][7]={
+ {20,40,55,0,0,1,8},{8,22,40,0,0,1,6},{4,12,30,0,0,1,5},{3,14,40,1,0,1,4},{0,8,36,2,0,1,4},
+ {0,8,36,1,0,2,4},{0,6,36,2,1,2,3},{0,4,28,2,1,2,3},{0,2,12,3,1,3,3},{0,0,0,4,1,4,3}};
+static uint8_t miss_win,miss_four,careless,vcf_depth,see_vcf,vcf_limit,sloppy;
 static const uint8_t three_pairs[256]={0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0};
 typedef struct {int32_t alpha,beta,best;uint8_t moves[8],n,next,remaining,side,parent_move,terminal,ready;} SearchFrame;
 typedef struct {uint8_t moves[8],n,next,move,block,stage;} ForceFrame;
@@ -51,6 +58,12 @@ static void candidate_tick(void){
 static int32_t position_value(uint8_t turn){uint8_t p,best_a=0,best_b=0,a,b;uint8_t *mine=go_strength(turn-1),*other=go_strength(2-turn);for(p=0;p<225;p++)if(!go_cells[p]){a=mine[p];b=other[p];if(a>best_a)best_a=a;if(b>best_b)best_b=b;}return (int16_t)best_a-best_b;}
 static uint8_t book_safe(void){uint8_t p;for(p=0;p<225;p++)if(!go_cells[p]&&(has(go_patterns[0][p],4)||has(go_patterns[1][p],4)))return 0;return 1;}
 static uint8_t winning_points(uint8_t turn,uint8_t *one){uint8_t p,n=0;for(p=0;p<225;p++)if(!go_cells[p]&&has(go_patterns[turn-1][p],6)){*one=p;if(++n>=2)return n;}return n;}
+static uint8_t careless_pick(void){
+ uint8_t i,j,t,order[8],n=W->n;uint8_t *mine=go_strength(side-1);
+ for(i=0;i<n;i++)order[i]=i;
+ for(i=0;i<n;i++)for(j=i+1;j<n;j++)if(mine[W->root[order[j]]]>mine[W->root[order[i]]]){t=order[i];order[i]=order[j];order[j]=t;}
+ return W->root[order[tt_random_below(n<sloppy?n:sloppy)]];
+}
 static void start_wait(void){phase=PH_WAIT;}
 static void choose_soft(void){
  uint8_t i,n=W->valid?W->n:W->iter_valid,chosen=0;int32_t best=-INF,diff,margin=temperature>>1;uint16_t total=0,weight;
@@ -60,10 +73,10 @@ static void choose_soft(void){
  ai_move=W->root[chosen];
 }
 static void search_init(void){
- SearchFrame *f;sp=0;iteration=2;memset(&W->frames,0,sizeof(W->frames));f=&W->frames.search[0];f->remaining=iteration;f->side=side;f->alpha=-INF;f->beta=INF;f->best=-INF;f->n=W->n;memcpy(f->moves,W->root,W->n);f->ready=1;phase=PH_SEARCH;W->iter_valid=0;
+ SearchFrame *f;sp=0;iteration=max_depth<2?max_depth:2;memset(&W->frames,0,sizeof(W->frames));f=&W->frames.search[0];f->remaining=iteration;f->side=side;f->alpha=-INF;f->beta=INF;f->best=-INF;f->n=W->n;memcpy(f->moves,W->root,W->n);f->ready=1;phase=PH_SEARCH;W->iter_valid=0;
 }
 static void force_init(uint8_t turn){
- ForceFrame *f;sp=0;force_side=turn;force_success=0;force_return=0;memset(&W->frames,0,sizeof(W->frames));f=&W->frames.force[0];candidate_begin(f->moves,turn,1,0,&f->n);phase=PH_VCF;
+ ForceFrame *f;sp=0;force_side=turn;vcf_limit=turn==side?vcf_depth:(vcf_depth>1?vcf_depth:2);force_success=0;force_return=0;memset(&W->frames,0,sizeof(W->frames));f=&W->frames.force[0];candidate_begin(f->moves,turn,1,0,&f->n);phase=PH_VCF;
 }
 static void finish_force(void){
  if(force_success){
@@ -73,7 +86,7 @@ static void finish_force(void){
    if(k==255){if(W->n<8)W->n++;k=W->n-1;}for(j=k;j;j--)W->root[j]=W->root[j-1];W->root[0]=force_root;}
   rival_line(3);search_init();return;
  }
- if(!force_pass){force_pass=1;force_init(3-side);}else search_init();
+ if(!force_pass&&see_vcf){force_pass=1;force_init(3-side);}else search_init();
 }
 static void force_step(void){
  ForceFrame *f=&W->frames.force[sp];uint8_t p,count,other,one=255;
@@ -88,7 +101,7 @@ static void force_step(void){
  if(f->stage==1){
   count=winning_points(force_side,&one);other=winning_points(3-force_side,&p);
   if(go_wins_at(f->move,force_side)||(!other&&count>=2)){force_success=1;force_return=1;return;}
-  if(other||count!=1||sp>=3){force_return=1;return;}f->block=one;f->stage=2;
+  if(other||count!=1||sp+1>=vcf_limit){force_return=1;return;}f->block=one;f->stage=2;
  }
  if(f->stage==2){go_set(f->block,3-force_side);f->stage=4;sp++;f=&W->frames.force[sp];memset(f,0,sizeof(*f));candidate_begin(f->moves,force_side,1,0,&f->n);return;}
 }
@@ -124,6 +137,7 @@ void ai_cancel(void) BANKED {if(ai_done)return;ai_cancelled=1;gen_active=0;unwin
 void ai_delay(uint16_t frames) BANKED {ai_started+=frames;ready_at+=frames;deadline+=frames;}
 void ai_begin(uint8_t color,uint8_t rival) BANKED {
  uint8_t style[7];side=color;profile=rival%10;rival_style(profile,style);attack_w=style[0];defense_w=style[1];max_depth=style[2];temperature=style[3];radius=style[4];lapse=style[5];pace=style[6];
+ miss_win=skills[profile][0];miss_four=skills[profile][1];careless=tt_random_below(100)<skills[profile][2];vcf_depth=skills[profile][3];see_vcf=skills[profile][4];max_depth=skills[profile][5];sloppy=skills[profile][6];
  ai_done=ai_resign=ai_cancelled=ai_completed_depth=0;ai_nodes=0;ai_started=tt_clock;hint_at=tt_clock+18;hint_index=0;deadline=ai_started+140;ready_at=ai_started+60+tt_random_below(51+pace*20);phase=PH_GUARD;sp=force_pass=guard_stage=gen_active=0;memset(W,0,sizeof(AIWork));ai_hint=112;ai_move=112;
 }
 void ai_tick(void) BANKED {
@@ -137,11 +151,14 @@ void ai_tick(void) BANKED {
  if(phase<PH_UNWIND&&(int16_t)(now-deadline)>=0){gen_active=0;unwind_vcf=phase==PH_VCF;unwind_stage=0;phase=PH_UNWIND;}
  if(gen_active)candidate_tick();
  else if(phase==PH_GUARD){
-  if(guard_stage==0){own=winning_points(side,&one);if(own){rival_line(2);ai_move=one;ai_hint=one;ready_at=ai_started+18+tt_random_below(23);start_wait();}else guard_stage=1;}
-  else if(guard_stage==1){opponent=winning_points(3-side,&one);if(opponent){ai_move=one;ai_hint=one;if(opponent>=2){ai_resign=1;rival_line(3);}ready_at=ai_started+18+tt_random_below(23);start_wait();}else guard_stage=2;}
+  if(guard_stage==0){own=winning_points(side,&one);if(own&&tt_random_below(100)>=miss_win){rival_line(2);ai_move=one;ai_hint=one;ready_at=ai_started+18+tt_random_below(23);start_wait();}else guard_stage=1;}
+  else if(guard_stage==1){opponent=winning_points(3-side,&one);if(opponent&&opponent<2&&tt_random_below(100)<miss_four){careless=1;opponent=0;}if(opponent){ai_move=one;ai_hint=one;if(opponent>=2){ai_resign=1;rival_line(3);}ready_at=ai_started+18+tt_random_below(23);start_wait();}else guard_stage=2;}
   else if(guard_stage==2){if(go_count<6&&book_safe()){rival_book_begin(profile);guard_stage=3;}else{candidate_begin(W->root,side,0,1,&W->n);guard_stage=4;}}
   else if(guard_stage==3){book=rival_book_step();if(book<225){ai_move=ai_hint=book;start_wait();}else if(book==255){candidate_begin(W->root,side,0,1,&W->n);guard_stage=4;}}
-  else {ai_move=W->root[0];ai_hint=ai_move;for(i=0;i<W->n;i++)W->iter_score[i]=ordering(W->root[i],side,0);W->iter_valid=W->n;force_init(side);}
+  else {ai_move=W->root[0];ai_hint=ai_move;
+   if(careless&&W->n){ai_move=ai_hint=careless_pick();start_wait();}
+   else{for(i=0;i<W->n;i++)W->iter_score[i]=ordering(W->root[i],side,0);W->iter_valid=W->n;
+    if(vcf_depth)force_init(side);else if(see_vcf){force_pass=1;force_init(3-side);}else search_init();}}
  }else if(phase==PH_VCF)force_step();else if(phase==PH_SEARCH)search_step();else if(phase==PH_UNWIND)unwind_step();
  if(W->n&&(int16_t)(now-hint_at)>=0){if(++hint_index>=W->n)hint_index=0;ai_hint=W->root[hint_index];hint_at=now+18;}
  if(phase==PH_WAIT&&(ai_cancelled||(int16_t)(now-ready_at)>=0)){

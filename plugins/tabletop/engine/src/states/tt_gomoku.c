@@ -389,7 +389,7 @@ void gomoku_enter(uint8_t mode, uint8_t rival) BANKED {
     tt_screen_reset();
     go_mode = mode;
     go_rival = rival;
-    go_player_color = 1 + tt_random_below(2);
+    go_player_color = mode == GO_PRACTICE ? 1 : 1 + tt_random_below(2);
     go_cursor = 112;
     go_opening = 255;
     go_reset();
