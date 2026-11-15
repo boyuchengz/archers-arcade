@@ -120,16 +120,20 @@ static void footer_hint(const char *a_label, uint8_t back) {
 static void footer_stat(void) {
     tt_win = 1;
     tt_fill(0, 0, 20, 1, 0, P_BAR);
-    if ((screen == SCR_MAIN && page == 0) || (screen == SCR_MODES && page == 0)) {
+    if (screen == SCR_MAIN && page == 0) {
+        tt_put(1, 0, TT_T_CROWN, P_BAR);
+        tt_text(3, 0, tt_save.tw_best ? "Best floor" : "New tower!", P_BAR);
+        if (tt_save.tw_best) tt_number(14, 0, tt_save.tw_best, 0, P_BAR);
+    } else if ((screen == SCR_MAIN && page == 1) || (screen == SCR_MODES && page == 0)) {
         tt_put(1, 0, TT_T_STAR, P_BAR);
         tt_text(3, 0, "Elo", P_BAR);
         tt_number(7, 0, tt_save.rating, 0, P_BAR);
         tt_text(12, 0, rank_name(tt_save.rating), P_BAR);
-    } else if (screen == SCR_MAIN && page == 1) {
+    } else if (screen == SCR_MAIN && page == 2) {
         tt_put(1, 0, TT_T_CROWN, P_BAR);
         tt_text(3, 0, "Best", P_BAR);
         tt_number(8, 0, tt_save.puzzle.best, 0, P_BAR);
-    } else if (screen == SCR_MAIN && page == 2) {
+    } else if (screen == SCR_MAIN && page == 3) {
         tt_put(1, 0, TT_T_SOUND, P_BAR);
         tt_text(3, 0, tt_save_available ? "Autosave is on" : "No save battery", P_BAR);
     } else if (screen == SCR_MODES && page == 1) {
@@ -167,7 +171,7 @@ static void draw_illustration(uint8_t n, uint8_t s, uint8_t x, uint8_t y) {
 }
 
 /* ------------------------------------------------------------------ page content */
-static const uint8_t main_ill[3] = {TT_ILL_GOMOKU, TT_ILL_2048, TT_ILL_SETTINGS};
+static const uint8_t main_ill[4] = {TT_ILL_TOWER, TT_ILL_GOMOKU, TT_ILL_2048, TT_ILL_SETTINGS};
 static const uint8_t mode_ill[3] = {TT_ILL_RANKED, TT_ILL_PRACTICE, TT_ILL_VERSUS};
 
 static void page_draw(uint8_t p, uint8_t s) {
@@ -194,8 +198,9 @@ static void page_draw(uint8_t p, uint8_t s) {
         draw_illustration(n, s, 7, 5);
     }
     if (screen == SCR_MAIN) {
-        if (p == 0) { tt_ctext(12, "GOMOKU", P_CARD); tt_ctext(13, "Five in a row", P_SUB); }
-        else if (p == 1) { tt_ctext(12, "2048", P_CARD); tt_ctext(13, "Slide & merge", P_SUB); }
+        if (p == 0) { tt_ctext(12, "ARROW TOWER", P_CARD); tt_ctext(13, "Climb forever", P_SUB); }
+        else if (p == 1) { tt_ctext(12, "GOMOKU", P_CARD); tt_ctext(13, "Five in a row", P_SUB); }
+        else if (p == 2) { tt_ctext(12, "2048", P_CARD); tt_ctext(13, "Slide & merge", P_SUB); }
         else { tt_ctext(12, "SETTINGS", P_CARD); tt_ctext(13, "Sound & save", P_SUB); }
     } else {
         if (p == 0) { tt_ctext(12, "RANKED", P_CARD); tt_ctext(13, "Climb the ladder", P_SUB); }
@@ -308,7 +313,7 @@ static void slide_tick(void) {
 
 /* ------------------------------------------------------------------ title */
 static void title_draw(void) {
-    uint8_t t[120], a[120], i;
+    uint8_t t[20], a[20], i, r;
     uint16_t c[20];
     for (i = 0; i < 20; i++) c[i] = title_pals[i];
     tt_pal_set(0, 20, c);
@@ -320,12 +325,14 @@ static void title_draw(void) {
     tt_fill(0, 1, 20, 8, 0, 3);
     tt_fill(0, 1, 20, 1, TT_T_RULE_TOP, 3);
     tt_fill(0, 8, 20, 1, TT_T_RULE_BOTTOM, 3);
-    for (i = 0; i < 120; i++) {
-        t[i] = tt_logo_map[i];
-        a[i] = (tt_logo_pals[i] ? 2 : 1) | TT_BK1;
+    for (r = 0; r < 6; r++) {
+        for (i = 0; i < 20; i++) {
+            t[i] = tt_logo_map[r * 20 + i];
+            a[i] = (tt_logo_pals[r * 20 + i] ? 2 : 1) | TT_BK1;
+        }
+        tt_rows(0, 2 + r, 20, 1, t, a);
     }
-    tt_rows(0, 2, 20, 6, t, a);
-    tt_ctext(15, "GOMOKU  &  2048", 0);
+    tt_ctext(15, "TOWER GOMOKU 2048", 0);
     tt_ctext(17, "2026 ARCHER", 0);
 }
 
@@ -367,8 +374,8 @@ static void title_tick(void) {
 static uint8_t last_pick;
 
 void tt_menu(void) BANKED {
-    carousel_open(SCR_MAIN, last_main, 3);
-    bars("ARCHER'S TABLETOP");
+    carousel_open(SCR_MAIN, last_main, 4);
+    bars("ARCHER'S ARCADE");
     footer_hint("Open", 1);
     tt_state = TT_MENU;
     carousel_finish_open();
@@ -396,8 +403,9 @@ static void match_open(void);
 static void carousel_select(void) {
     if (screen == SCR_MAIN) {
         last_main = page;
-        if (page == 0) gomoku_menu();
-        else if (page == 1) puzzle_enter();
+        if (page == 0) tower_enter();
+        else if (page == 1) gomoku_menu();
+        else if (page == 2) puzzle_enter();
         else settings_open();
     } else if (screen == SCR_MODES) {
         last_mode = page;

@@ -72,8 +72,9 @@ typedef struct SCRIPT_CTX {
 #define VM_MAX_CONTEXTS 2
 // stack size of each VM thread
 #define VM_CONTEXT_STACK_SIZE 64
-// number of shared variables
-#define VM_HEAP_SIZE 128
+// number of shared variables (this project defines none; the scene is pure C,
+// so the heap is kept tiny to leave RAM for the C stack)
+#define VM_HEAP_SIZE 16
 // quant size
 #define INSTRUCTIONS_PER_QUANT 0x10
 // termination flag

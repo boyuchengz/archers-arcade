@@ -33,7 +33,7 @@
 
 /* Palette RAM mirror: 0..31 background, 32..63 objects. */
 extern uint16_t tt_pal[64];
-extern uint8_t tt_bright,tt_win,tt_shake,tt_scx,tt_split_scx,tt_split_on,tt_pattern_on;
+extern uint8_t tt_bright,tt_win,tt_shake,tt_scx,tt_scy,tt_split_scx,tt_split_on,tt_pattern_on;
 
 void tt_gfx_init(void) BANKED;
 void tt_pal_set(uint8_t first,uint8_t count,const uint16_t *ram_colors) BANKED;

@@ -6,7 +6,8 @@
 #include "states/tt_music_data.h"
 
 #define NONE 255
-static uint8_t cur = NONE, want = NONE, step, wait;
+static uint8_t cur = NONE, want = NONE, wait;
+static uint16_t step;
 static uint8_t sfx2, sfx4, next_at, next_note, next_env;
 
 static const uint8_t bass_wave[16] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
@@ -49,7 +50,7 @@ static void start(uint8_t song) {
 }
 
 void tt_music(uint8_t song) BANKED {
-    if (song < JINGLE_WIN) {
+    if (songs[song].loop) {
         want = song;
         if (!tt_save.sound || !tt_music_on()) { cur = NONE; silence(); return; }
         if (cur == song) return;
@@ -176,6 +177,44 @@ void tt_sound_pitch(uint8_t effect, uint8_t pitch) BANKED {
         trigger_ch2(N(6, 4), 0x80, 0x51, 60); sfx2 = 3; break;
     case SFX_WHOOSH:
         trigger_ch4(0x2B, 0x31, 40); sfx4 = 10; break;
+    case SFX_JUMP:
+        trigger_ch2(N(5, 2), 0x80, 0x81, 0); sfx2 = 6;
+        next_note = N(5, 9); next_env = 0x71; next_at = 2; break;
+    case SFX_LAND:
+        trigger_ch4(0x41, 0x55, 58); sfx4 = 4; break;
+    case SFX_SHOOT:
+        trigger_ch2(N(6, 7), 0x40, 0x91, 0); sfx2 = 6;
+        next_note = N(5, 7); next_env = 0x61; next_at = 2;
+        trigger_ch4(0x31, 0x23, 60); sfx4 = 3; break;
+    case SFX_THUNK:
+        trigger_ch4(0x92, 0x56, 54); sfx4 = 6;
+        trigger_ch2(N(3, 7), 0x80, 0x71, 58); sfx2 = 3; break;
+    case SFX_TINK:
+        trigger_ch2(N(7, 4), 0x40, 0x61, 60); sfx2 = 3; break;
+    case SFX_COIN:
+        trigger_ch2(N(6, 11), 0x80, 0xA1, 0); sfx2 = 10;
+        next_note = N(7, 4); next_env = 0xA3; next_at = 3; break;
+    case SFX_GEM:
+        trigger_ch2(N(6, 4), 0x80, 0xB1, 0); sfx2 = 12;
+        next_note = N(7, 0); next_env = 0xB4; next_at = 3; break;
+    case SFX_STOMP:
+        trigger_ch4(0xA1, 0x52, 56); sfx4 = 5;
+        trigger_ch2(N(4, 0), 0x80, 0xA1, 0); sfx2 = 8;
+        next_note = N(5, 0); next_env = 0x91; next_at = 2; break;
+    case SFX_HURT:
+        trigger_ch2(N(4, 6), 0xC0, 0xC2, 0); sfx2 = 14;
+        next_note = N(3, 6); next_env = 0xB3; next_at = 4;
+        trigger_ch4(0x92, 0x63, 50); sfx4 = 8; break;
+    case SFX_SPRING:
+        trigger_ch2(N(4, 7), 0x80, 0xB2, 0); sfx2 = 10;
+        next_note = N(6, 0); next_env = 0xA3; next_at = 3; break;
+    case SFX_CRUMBLE:
+        trigger_ch4(0xA3, 0x6E, 0); sfx4 = 14; break;
+    case SFX_CANNON:
+        trigger_ch4(0xC2, 0x71, 0); sfx4 = 12; break;
+    case SFX_HEART:
+        trigger_ch2(N(5, 7), 0x80, 0xA2, 0); sfx2 = 12;
+        next_note = N(6, 7); next_env = 0xA4; next_at = 4; break;
     }
 }
 

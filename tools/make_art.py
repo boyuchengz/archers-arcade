@@ -1,4 +1,4 @@
-"""Generate every tile, map and palette for Archer's Tabletop.
+"""Generate every tile, map and palette for Archer's Arcade.
 
     python3 tools/make_art.py            # writes engine headers + tools/preview/*.png
 
@@ -482,11 +482,11 @@ for i in range(4):  # reserve tiles 0..3 for the animated pattern
 define('TT_M_PATTERN', 0)
 
 # ---- title logo -----------------------------------------------------
-# "TABLETOP" in 3x-wide/3x-tall bold letters, gold over orange, ink outline + extrude
+# "ARCADE" in 3x-wide/3x-tall bold letters, gold over orange, ink outline + extrude
 LOGO_W, LOGO_H = 160, 48
 logo = new(LOGO_W, LOGO_H)
-word = 'TABLETOP'
-sx, sy = 2, 3
+word = 'ARCADE'
+sx, sy = 3, 3
 widths = [glyph_width(c) * sx for c in word]
 gap = 2
 total = sum(widths) + gap * (len(word) - 1)
@@ -670,7 +670,47 @@ illus('versus', ill_versus(), 'a' * 36, pal('CREAM', 'NAVY_L', 'BLACK', 'INK'), 
 # tweak: sparks use palette b
 ILL['versus']['pals'] = [1 if (i in (2, 3, 32, 33)) else 0 for i in range(36)]
 
-ILL_ORDER = ['gomoku', '2048', 'settings', 'ranked', 'practice', 'versus']
+
+
+def ill_tower():
+    im = new(48, 48)
+    d = ImageDraw.Draw(im)
+    # tower body with battlements (palette a: cream, stone, green, ink)
+    d.rectangle((8, 9, 33, 47), fill=1, outline=3)
+    for x in (8, 15, 22, 29):
+        d.rectangle((x, 4, x + 4, 9), fill=1, outline=3)
+    for y in (20, 32, 44):
+        d.line((9, y, 32, y), fill=3)
+    for y, off in ((14, 0), (26, 4), (38, 0)):
+        for x in range(10 + off, 32, 8):
+            d.point((x, y), fill=3)
+    # arched windows
+    for (x, y) in ((13, 23), (24, 35)):
+        d.rectangle((x, y + 1, x + 3, y + 6), fill=3)
+        d.line((x + 1, y, x + 2, y), fill=3)
+    # a wooden ledge sticking out with two arrows stuck in the wall
+    d.rectangle((33, 30, 44, 32), fill=0, outline=3)
+    d.line((34, 21, 41, 21), fill=3)
+    d.line((36, 20, 36, 22), fill=3)
+    # the hero on the ledge: green hood, cream face
+    hero = ['..333...', '.32223..', '3222233.', '3223003.', '3223003.', '.322223.', '.32223..', '..3.3...']
+    for yy, r in enumerate(hero):
+        for xx, ch in enumerate(r):
+            if ch in '023':
+                im.putpixel((36 + xx, 22 + yy), int(ch))
+    # pennant on top (palette b)
+    d.line((19, 0, 19, 4), fill=3)
+    d.polygon([(20, 0), (26, 1), (20, 3)], fill=2)
+    # coins floating up the side (palette b)
+    for (x, y) in ((40, 9), (42, 14)):
+        d.ellipse((x - 2, y - 2, x + 2, y + 2), fill=1, outline=3)
+    return im
+
+
+illus('tower', ill_tower(), 'abbbab' 'aaaaab' 'aaaaaa' 'aaaaaa' 'aaaaaa' 'aaaaaa',
+      pal('CREAM', '9aaec8', '3cae4c', 'INK'), pal('CREAM', 'GOLD', 'CORAL', 'INK'))
+
+ILL_ORDER = ['gomoku', '2048', 'settings', 'ranked', 'practice', 'versus', 'tower']
 for i, n in enumerate(ILL_ORDER):
     define(f'TT_ILL_{n.upper()}', i)
     preview(ILL[n]['image'], ['CREAM', 'GOLD', 'ORANGE', 'INK'], 3).save(PREV / f'ill_{n}.png')

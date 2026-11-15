@@ -1,5 +1,5 @@
 #pragma bank 255
-/* Archer's Tabletop: GB Studio scene type whose init never returns. It owns the
+/* Archer's Arcade: GB Studio scene type whose init never returns. It owns the
    screen, input, audio and the save, and dispatches to the game modules. */
 #include <gb/gb.h>
 #include <gb/cgb.h>
@@ -21,6 +21,9 @@ static void tick(void) {
     switch (tt_state) {
     case TT_PUZZLE:
         puzzle_tick();
+        break;
+    case TT_TOWER:
+        tower_tick();
         break;
     case TT_GOMOKU:
     case TT_RESULT:

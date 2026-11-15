@@ -8,7 +8,8 @@
 #include "states/tt_art_base.h"
 
 uint16_t tt_pal[64];
-uint8_t tt_bright, tt_win, tt_shake, tt_scx, tt_split_scx, tt_split_on, tt_pattern_on;
+uint8_t tt_bright, tt_win, tt_shake, tt_scx, tt_scy, tt_split_scx, tt_split_on, tt_pattern_on;
+extern uint8_t fx_n;
 static uint8_t pal_dirty;
 
 /* Off-screen page buffer for the carousel: 20x13 tiles (+attrs). Lives in the
@@ -304,6 +305,8 @@ void tt_screen_reset(void) BANKED {
     tt_split_on = 0;
     tt_split_scx = 0;
     tt_scx = 0;
+    tt_scy = 0;
+    fx_n = SPR_FX_COUNT;
     tt_shake = 0;
     tt_pattern_on = 0;
     tt_to_buffer = 0;

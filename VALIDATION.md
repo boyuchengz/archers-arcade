@@ -1,41 +1,28 @@
-# Validation (v2.1)
+# Validation (v3.1)
 
-Release ROM `ArchersTabletop-v2.1.gbc`: 262,144 bytes, SHA-256 `8719f0607f004e61d28aa1d70e90362328fe691663a6c45179d7e818fe48323a`.
+Release ROM `ArchersArcade-v3.1.gbc`: 262,144 bytes, SHA-256 `904ede2a717404f4dd7e57cffa94eb907f2fbaf4f6cf4902b80fbccd65a27e0e`.
 
-## Difficulty ladder (v2.1, `tests/difficulty_sim.c`, 400 games per rival, colors alternating)
-
-Player win rate. "Newcomer" builds lines and often misses threats; "decent" blocks fours, usually blocks open threes and spots open fours; "strong" is the SOREN engine itself.
-
-| Rival | Newcomer | Decent | Strong |
-|---|---|---|---|
-| PIP 600 | 62% | 96% | 94% |
-| RUSH 780 | 48% | 95% | 93% |
-| MARA 900 | 40% | 91% | 89% |
-| JUNE 1020 | 40% | 90% | 73% |
-| VEX 1120 | 33% | 84% | 73% |
-| ORIN 1240 | 36% | 80% | 69% |
-| NOVA 1380 | 31% | 68% | 63% |
-| ROOK 1500 | 23% | 62% | 57% |
-| IRIS 1640 | 19% | 57% | 56% |
-| SOREN 1800 | 11% | 40% | 50% |
-
-Before v2.1 every rival measured the same (newcomer 11-17%, decent 40-58%, strong 45-59% against all ten). SOREN's settings are unchanged. On the release ROM the longest AI turn measured 145 frames (about 2.4 s).
+v3.1 adds coin rewards (a heart every 50 coins, +10 at full health) and eight hood colours unlocked by the lifetime coin bank. Checked in the emulator: the 50th coin restores a heart, the 100th at full health adds 10, a game over banks the run's coins and announces a newly unlocked hood, the start-screen picker cycles only unlocked hoods and the choice is saved; Prism cycles colours.
 
 ## Build
 - Official GB Studio 4.3.2 CLI build (GBDK 4.5.0), GBC-only.
-- Header identical in configuration to the v1 cartridge: CGB flag 0xC0, cartridge type 0x1E (MBC5 + RAM + battery), ROM 256 KB, RAM 32 KB. Header and global checksums valid.
-- Memory: ROM0 609 bytes free; WRAM 881 bytes free (unused GB Studio projectile, trigger and script-text buffers were shrunk via header overrides).
-- Save layout unchanged from v1, so existing ratings, rival history and the 2048 board load as-is.
+- Header: title `ARCHERSARCADE`, CGB flag 0xC0, cartridge type 0x1E (MBC5 + RAM + battery), ROM 256 KB, RAM 32 KB, same as earlier cartridges. Header and global checksums valid.
+- ROM: about 20 KB still free (banks 13 to 15).
+- RAM: 996 bytes free in WRAM high. The C stack has 740 bytes between the heap and its top; the deepest use measured in the emulator was 231 bytes (during Gomoku's strongest AI), 211 bytes in the tower and menus. The tower record (best floor, coin bank, checkpoint, hood) is appended to the save.
+- Save: v1 and v2 saves load unchanged (accepted sizes 130, 180 and 186 bytes); the tower record is appended and starts at zero.
 
-## Desktop tests (`sh tests/run.sh`)
-All four suites pass: 2048 rules/save (20,096 checks), Gomoku core (110,271), AI (1,815; strongest vs beginner 20/0), rivals/saves (8,731, including legacy-save migration).
+## Desktop tests
+- `sh tests/run.sh`: all four suites pass: 2048 rules/save (20,096 checks), Gomoku core (110,271), AI (1,815; strongest vs beginner 20/0), rivals/saves (8,731, including legacy-save migration).
+- Tower rooms: every one of the 39 templates passes the reachability checker for each entrance it accepts (`python3 tools/tower_rooms.py`).
+- Tower room builder (`tests/test_tower_gen.c` + `tools/check_tower_rooms.py`): 50,000+ generated floors across eight seeds (about half of them new procedural layouts), 0 unclimbable rooms, 0 unsafe entrances.
 
 ## Emulator checks (PyBoy 2.7, CGB mode, exact release ROM)
-- Title, main carousel (all three pages, both directions), Gomoku mode carousel, rival select (10 rivals), Settings (toggles, erase confirmation), ranked roulette landing on the matched rival.
-- 2048: slides, merges with sparkles and score popups, undo, pause menu (resume/new game/menu), "YOU MADE 2048!" popup with confetti, game-over popup with undo, 2,500-move random soak with no hang.
-- Gomoku: two-player five-in-a-row with the win-line sparkle chain, result card, Select to hide it; ranked game with Elo change; five practice games against rivals PIP, MARA, VEX, NOVA and IRIS played to completion with correct winners.
-- Steady-state main loop runs at one iteration per frame; fades take 8 frames each way.
-- Audio rendered to WAV: music is present on every screen; title lead melody measured at E5-G5-C6-B5-G5-E5 over a C bass, matching the score.
+- Title, four-card main menu, tower start panel, pause panel (Resume, Restart run, Main menu), game-over and new-record panels, retry from checkpoint, quit to menu; 2048 and Gomoku still start and play from their new menu positions.
+- Physics: full jump 30 px, tapped jump 11 px, run speed about 1.3 px per frame, spring launch 72 px, walls and ceilings block correctly.
+- Mechanics: arrows stick in wood and can be stood on; arrows break on stone; stomping a slime pops it (+1 coin) and bounces; side contact costs a heart with knockback; spikes cost a heart and respawn you at the entrance; crumbling blocks fall after standing on them and come back; moving platforms carry the hero; cannons fire; icicles fall when you pass under them; the campfire refills hearts and saves the checkpoint; checkpoint floors can be picked on the start screen.
+- Camera pans between floors take 30 to 35 frames, including pans into a new zone (colours cross-fade over three-frame steps). The main loop drops at most one frame on a normal floor change and none during normal play.
+- Climbed to floor 200 with no failed transitions; 42,000 frames of random input (mashing, deaths, retries, pauses) with no hang.
+- Audio: tower music and effects present.
 
 ## Not verified here
-Real-hardware appearance, audio balance on the Chromatic speaker, and power-cycle save retention need a check on the device after flashing.
+Real-hardware feel of the controls, audio balance on the Chromatic speaker and power-cycle save retention need a check on the device after flashing.

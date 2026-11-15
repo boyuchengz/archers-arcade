@@ -20,7 +20,7 @@ static uint16_t crc_byte(uint16_t c,uint8_t b){uint8_t k;c^=(uint16_t)b<<8;for(k
 static uint16_t ram_crc(uint16_t off,uint16_t n){uint16_t i,c=0xFFFF;for(i=0;i<n;i++)c=crc_byte(c,SAVE_RAM[off+12+i]);return c;}
 static uint8_t valid(uint16_t off){
  uint16_t c,n;if(SAVE_RAM[off]!='A'||SAVE_RAM[off+1]!='T'||SAVE_RAM[off+2]!=1||SAVE_RAM[off+3]!=0xA5)return 0;
- n=SAVE_RAM[off+6]|((uint16_t)SAVE_RAM[off+7]<<8);if(n!=sizeof(SaveData)&&n!=offsetof(SaveData,rival_first))return 0;
+ n=SAVE_RAM[off+6]|((uint16_t)SAVE_RAM[off+7]<<8);if(n!=sizeof(SaveData)&&n!=offsetof(SaveData,tw_best)&&n!=offsetof(SaveData,rival_first))return 0;
  c=SAVE_RAM[off+8]|((uint16_t)SAVE_RAM[off+9]<<8);return c==ram_crc(off,n);
 }
 void tt_defaults(void) BANKED {memset(&tt_save,0,sizeof(tt_save));tt_save.rating=1000;tt_save.rng=0x8A751E43;tt_save.sound=1;tt_save.last_rival=255;memset(tt_save.rival_first,255,10);memset(tt_save.rival_reply,255,10);}

@@ -10,6 +10,7 @@ typedef struct {
 } Particle;
 
 static Particle fx[SPR_FX_COUNT];
+uint8_t fx_n = SPR_FX_COUNT;   /* the tower lends the top slots to its enemies */
 
 void fx_clear(void) BANKED {
     uint8_t i;
@@ -21,7 +22,7 @@ void fx_clear(void) BANKED {
 
 void fx_spawn(uint8_t kind, uint8_t x, uint8_t y, int8_t vx, int8_t vy, uint8_t tile, uint8_t prop, uint8_t life) BANKED {
     uint8_t i, best = 0, best_life = 255;
-    for (i = 0; i < SPR_FX_COUNT; i++) {
+    for (i = 0; i < fx_n; i++) {
         if (!fx[i].life) { best = i; break; }
         if (fx[i].life < best_life) { best_life = fx[i].life; best = i; }
     }
@@ -68,7 +69,7 @@ void fx_text(uint8_t x, uint8_t y, const char *s) BANKED {
 void fx_tick(void) BANKED {
     uint8_t i, sx, sy, t;
     Particle *p = fx;
-    for (i = 0; i < SPR_FX_COUNT; i++, p++) {
+    for (i = 0; i < fx_n; i++, p++) {
         if (!p->life) continue;
         if (!--p->life) {
             hide_sprite(SPR_FX + i);

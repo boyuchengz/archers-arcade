@@ -198,6 +198,55 @@ song('best', 3, 0,
      [0] * 16,
      dict(d1=0x80, e1=0xB3, d2=0x40, e2=0x83, v3=0x20))
 
+# ------------------------------------------------------------------ TOWER: "Up the Spire" (D minor, driving)
+lead = seq("""
+D5:2 F5:2 A5:4 G5:2 F5:2 E5:2 D5:2
+C5:2 E5:2 G5:4 F5:2 E5:2 C5:4
+D5:2 F5:2 A5:2 D6:2 C6:2 A5:2 G5:2 F5:2
+E5:4 G5:4 A5:6 r:2
+Bb5:2 A5:2 G5:2 F5:2 G5:4 D5:4
+C5:2 D5:2 E5:2 F5:2 G5:4 E5:4
+F5:2 G5:2 A5:2 C6:2 D6:4 C6:2 A5:2
+D6:6 A5:2 D6:4 r:4
+F5:2 A5:2 C6:4 A5:2 C6:2 F6:4
+E6:2 D6:2 C6:2 Bb5:2 A5:4 G5:4
+Bb5:2 D6:2 F6:4 E6:2 D6:2 C6:4
+A5:2 C6:2 E6:4 D6:6 r:2
+D6:2 C6:2 Bb5:2 A5:2 G5:2 A5:2 Bb5:4
+A5:2 G5:2 F5:2 E5:2 F5:4 A5:4
+G5:2 A5:2 Bb5:2 C6:2 D6:2 E6:2 F6:4
+E6:4 C#6:4 D6:6 r:2
+""", steps=256)
+
+
+def stab(a, b, c):
+    return f"r:2 {a}:2 r:2 {b}:2 r:2 {a}:2 r:2 {c}:2"
+
+
+CH = {'Dm': ('F4', 'A4', 'D5'), 'C': ('E4', 'G4', 'C5'), 'A': ('E4', 'A4', 'C#5'), 'Bb': ('F4', 'Bb4', 'D5'),
+      'F': ('F4', 'A4', 'C5'), 'Am': ('E4', 'A4', 'C5'), 'Gm': ('G4', 'Bb4', 'D5')}
+PROG = ['Dm', 'C', 'Dm', 'A', 'Bb', 'C', 'F', 'Dm', 'F', 'C', 'Bb', 'Am', 'Gm', 'Dm', 'C', 'A']
+harm = seq(' '.join(stab(*CH[c]) for c in PROG), steps=256)
+ROOTS = {'Dm': ('D3', 'A2', 'D4'), 'C': ('C3', 'G2', 'C4'), 'A': ('A2', 'E3', 'A3'), 'Bb': ('Bb2', 'F3', 'Bb3'),
+         'F': ('F2', 'C3', 'F3'), 'Am': ('A2', 'E3', 'A3'), 'Gm': ('G2', 'D3', 'G3')}
+bass = seq(' '.join(walk(*ROOTS[c]) for c in PROG).replace(':1.', ':1'), bass=True, steps=256)
+bass = [1 if (i % 2 == 1) else v for i, v in enumerate(bass)]
+dr = drums((['k.h.s.h.k.k.s.h.'] * 7 + ['k.h.s.h.k.s.sss.']) * 2)
+song('tower', 6, 1, lead, harm, bass, dr, dict(d1=0x80, e1=0xA4, d2=0x40, e2=0x52, v3=0x20))
+
+song('check', 5, 0,
+     seq('D5:2 F#5:2 A5:2 D6:8 r:2'),
+     seq('A4:2 D5:2 F#5:2 A5:8 r:2'),
+     seq('D3:8 D3:6 r:2', bass=True),
+     [4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+     dict(d1=0x80, e1=0xB4, d2=0x40, e2=0x84, v3=0x20))
+song('zone', 4, 0,
+     seq('G5:2 C6:2 E6:2 G6:6 E6:2 G6:10 r:2'),
+     seq('E5:2 G5:2 C6:2 E6:6 C6:2 E6:10 r:2'),
+     seq('C3:6 G3:6 C4:12 r:2', bass=True),
+     drums(['k.k.k.s.....k.s.']) + [0] * 10,
+     dict(d1=0x80, e1=0xC5, d2=0x40, e2=0x95, v3=0x20))
+
 # ------------------------------------------------------------------ write
 freq = []
 for i in range(72):
@@ -209,7 +258,7 @@ lines.append('static const uint16_t note_period[72]={' + ','.join(map(str, freq)
 for s in SONGS:
     for c in range(4):
         lines.append(f"static const uint8_t song_{s['name']}_{c}[]={{" + ','.join(map(str, s['ch'][c])) + '};')
-lines.append('typedef struct {const uint8_t *ch[4];uint8_t len,tempo,loop,d1,e1,d2,e2,v3;} Song;')
+lines.append('typedef struct {const uint8_t *ch[4];uint16_t len;uint8_t tempo,loop,d1,e1,d2,e2,v3;} Song;')
 lines.append('static const Song songs[]={')
 for s in SONGS:
     i = s['inst']
