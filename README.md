@@ -122,6 +122,6 @@ A few things that took some care:
 
 ## License
 
-[MIT](LICENSE). The five engine headers above are modified from GB Studio, which is also MIT licensed; its notice is included in the LICENSE file.
+[MIT](LICENSE). The five engine headers above are modified from GB Studio, which is also MIT licensed; its notice is in [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES).
 
 Made by [Boyucheng Zhang](https://boyucheng.me).
